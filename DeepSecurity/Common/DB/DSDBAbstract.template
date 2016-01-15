@@ -60,7 +60,7 @@
             "MinLength"   : 8,
             "MaxLength"   : 41,
             "AllowedPattern" : "[a-zA-Z0-9!$^*-_+]*",
-            "ConstraintDescription" : "Can only contain alphanumeric characters or the following special characters !$^*-_+ . Min length 8, max length 41"
+            "ConstraintDescription" : "Can only contain alphanumeric characters or the following special characters !$^*-_+ Min length 8, max length 41"
         },
         "DBPName"             : {
             "Default" : "dsm",

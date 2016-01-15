@@ -47,12 +47,12 @@
         },
         "DeepSecurityAdminPass"     : {
             "NoEcho" : true,
-            "Description" : "The Deep Security Manager administrator password. Must be 8-41 characters long and can only contain alphanumeric characters or the following special characters !$^*-_+ .",
+            "Description" : "The Deep Security Manager administrator password. Must be 8-41 characters long and can only contain alphanumeric characters or the following special characters !$^*-_+",
             "Type"        : "String",
             "MinLength"   : 8,
             "MaxLength"   : 41,
             "AllowedPattern" : "[a-zA-Z0-9!$^*-_+]*",
-            "ConstraintDescription" : "Can only contain alphanumeric characters or the following special characters !$^*-_+ . Min length 8, max length 41"
+            "ConstraintDescription" : "Can only contain alphanumeric characters or the following special characters !$^*-_+ Min length 8, max length 41"
         },
 		"ProtectedInstances"           : {
             "Description" : "Select how many instances would you like to protect.",
