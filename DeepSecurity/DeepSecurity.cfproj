@@ -48,6 +48,21 @@
     <Compile Include="Marketplace\MasterMP96.template">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="QuickStart\BYOLTest.template">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="QuickStart\Infrastructure.template">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="QuickStart\PPUTest.template">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="QuickStart\TMQuickStartBYOL.template">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="QuickStart\TMQuickStartPPU.template">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="RHEL\DSM96RH.template">
       <SubType>Code</SubType>
     </Compile>
@@ -87,6 +102,7 @@
     <Folder Include="Common\Security Groups\" />
     <Folder Include="Common" />
     <Folder Include="Marketplace" />
+    <Folder Include="QuickStart" />
     <Folder Include="RHEL" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

@@ -1,0 +1,156 @@
+{
+    "AWSTemplateFormatVersion" : "2010-09-09",
+    "Description"              : "Template to help with testing the BYOL QuickStart",
+    "Parameters"               : {
+        "AWSKeyPairName" : {
+            "Description" : "Select an existing key pair to use for connecting to your Deep Security Manager Instance.",
+            "Type"        : "AWS::EC2::KeyPair::KeyName",
+            "MinLength"   : "1",
+            "MaxLength"   : "255",
+            "AllowedPattern" : "[-_a-zA-Z0-9]*",
+            "ConstraintDescription" : "Select an existing EC2 Key Pair."
+        },
+        "DeepSecurityAdminName"         : {
+            "Default" : "MasterAdmin",
+            "NoEcho"  : false,
+            "Description" : "The Deep Security Manager administrator username for Web Console Access.",
+            "Type"        : "String",
+            "MinLength"   : 1,
+            "MaxLength"   : 16,
+            "AllowedPattern" : "[a-zA-Z][a-zA-Z0-9]*",
+            "ConstraintDescription" : "Must begin with a letter and contain only alphanumeric characters. Min length 1, max length 16"
+        },
+        "DeepSecurityAdminPass"     : {
+            "NoEcho" : true,
+            "Description" : "The Deep Security Manager administrator password. Must be 8-41 characters long and can only contain alphanumeric characters or the following special characters !$^*-_+ .",
+            "Type"        : "String",
+            "MinLength"   : 8,
+            "MaxLength"   : 41,
+            "AllowedPattern" : "[a-zA-Z0-9!$^*-_+]*",
+            "ConstraintDescription" : "Can only contain alphanumeric characters or the following special characters !$^*-_+ . Min length 8, max length 41"
+        },
+        "DatabaseAdminName"        : {
+            "Default" : "dsadmin",
+            "NoEcho"  : false,
+            "Description" : "The RDS Database administrator username to be used for the database instance.",
+            "Type"        : "String",
+            "MinLength"   : 1,
+            "MaxLength"   : 16,
+            "AllowedPattern" : "[a-zA-Z][a-zA-Z0-9]*",
+            "ConstraintDescription" : "Must begin with a letter and contain only alphanumeric characters. Min length 1, max length 16"
+        },
+        "DatabaseAdminPassword"    : {
+            "NoEcho" : true,
+            "Description" : "The RDS Database administrator password. Must be 8-41 characters long and can only contain alphanumeric characters or the following special characters !$^*-_+ .",
+            "Type"        : "String",
+            "MinLength"   : 8,
+            "MaxLength"   : 41,
+            "AllowedPattern" : "[a-zA-Z0-9!$^*-_+]*",
+            "ConstraintDescription" : "Can only contain alphanumeric characters or the following special characters !$^*-_+ . Min length 8, max length 41"
+        },
+		"DatabaseEngine"            : {
+            "Description" : "Choose Oracle or Microsoft SQL  for Deep Security database engine.",
+            "Type"        : "String",
+            "Default"     : "Oracle",
+            "AllowedValues" : [
+                "Oracle",
+                "MSSQL"
+            ]
+        },
+		"EnableDNSHostNames" : {
+            "Description" : "Enable DNS Host Names",
+			"Type" : "String",
+            "AllowedValues" : [
+                "true",
+                "false"
+                ],
+            "Default" : "true"
+            },
+		"DatabaseInstanceId": {
+            "Description" : "RDS Instance ID. Can only contain alphanumeric characters or dashes(-). Min length 1, max length 15.",
+            "Type"        : "String",
+            "MinLength"   : 1,
+			"MaxLength"   : "15",
+			"AllowedPattern" : "[a-zA-Z0-9-]*",
+            "ConstraintDescription" : "Can only contain alphanumeric characters or dashes(-). Min length 1, max length 15"
+        }
+    },
+    "Resources"                : {
+	    "Infrastructure" : {
+            "Type" : "AWS::CloudFormation::Stack",
+            "Properties" : {
+                "TemplateURL" : "https://s3.amazonaws.com/trend-micro-quick-start/v2/Infrastructure.template",
+                "Parameters"  : {
+                    "EnableDNSHostNames" : {
+                        "Ref" : "EnableDNSHostNames"
+                    }
+                }
+            }
+        },
+        "BYOLTemplate" : {
+            "Type" : "AWS::CloudFormation::Stack",
+            "DependsOn" : "Infrastructure",
+			"Properties" : {
+                "TemplateURL" : "https://s3.amazonaws.com/trend-micro-quick-start/TMQuickStartBYOL.template",
+                "Parameters"  : {
+                    "AWSKeyPairName" : {
+                        "Ref" : "AWSKeyPairName"
+                    },
+                    "AWSVPC"         : {
+                        "Fn::GetAtt" : [
+                            "Infrastructure",
+                            "Outputs.VPCID"
+                        ]
+                    },
+					"DeepSecuritySubnet"         : {
+                        "Fn::GetAtt" : [
+                            "Infrastructure",
+                            "Outputs.PublicSubnet"
+                        ]
+                    },
+					"DeepSecurityAdminName"         : {
+                        "Ref" : "DeepSecurityAdminName"
+                    },
+					"DeepSecurityAdminPass"         : {
+                        "Ref" : "DeepSecurityAdminPass"
+                    },
+					"DatabaseSubnet1"         : {
+                         "Fn::GetAtt" : [
+                            "Infrastructure",
+                            "Outputs.PrivateSubnet1"
+                        ]
+                    },
+					"DatabaseSubnet2"         : {
+                        "Fn::GetAtt" : [
+                            "Infrastructure",
+                            "Outputs.PrivateSubnet2"
+                        ]
+                    },
+					"DatabaseEngine"         : {
+                        "Ref" : "DatabaseEngine"
+                    },
+					"DatabaseAdminName"         : {
+                        "Ref" : "DatabaseAdminName"
+                    },
+					"DatabaseAdminPassword"         : {
+                        "Ref" : "DatabaseAdminPassword"
+                    },
+					"LicenseKey"         : "",
+					"DatabaseInstanceId"         : {
+                        "Ref" : "DatabaseInstanceId"
+                    }
+                }
+            }
+        }
+    },
+	"Outputs"                  : {
+        "DeepSecurityConsole" : {
+            "Value" : {
+	            "Fn::GetAtt" : [
+					"PPUTemplate",
+                    "Outputs.DeepSecurityConsole"
+				]
+            }
+        }
+    }
+}
