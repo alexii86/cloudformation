@@ -5,13 +5,34 @@ if [ "$5" == "1" ]; then
   openssl req -nodes -new -sha256 -newkey rsa:2048 -subj '/CN='DeepSecurityManager'/O=Trend Micro/OU=Deep Security Manager/subjectAltName='$2'' -keyout /etc/cfn/privatekey -out /etc/cfn/csr;
   openssl x509 -req -days 3650 -in /etc/cfn/csr -signkey /etc/cfn/privatekey -out /etc/cfn/certificatebody;
   aws iam upload-server-certificate --server-certificate-name DeepSecurityElbCertificate-$4 --certificate-body file:///etc/cfn/certificatebody --private-key file:///etc/cfn/privatekey
-#sleep 10 seconds so iam has time to publish the certificate for other services to use
-  sleep 20
 fi
 
 certid=$(aws iam get-server-certificate --server-certificate-name DeepSecurityElbCertificate-$4 --query ServerCertificate.ServerCertificateMetadata.Arn --output text)
 
+## keep looking for the certificate until we get it back from iam
+until [ -n "$certid" -a "$certid" != " " ]
+do
+	echo 'cert not ready'
+	sleep 10
+	certid=$(aws iam get-server-certificate --server-certificate-name DeepSecurityElbCertificate-$4 --query ServerCertificate.ServerCertificateMetadata.Arn --output text)
+done
 
-aws elb create-load-balancer-listeners --region $6 --load-balancer-name $1 --listeners Protocol=HTTPS,LoadBalancerPort=$3,InstanceProtocol=HTTPS,InstancePort=$3,SSLCertificateId=$certid
+## wait for the cert to be ready
+sleep 30
+
+aws elb create-load-balancer-listeners --region $6 --load-balancer-name $1 --listeners Protocol=HTTPS,LoadBalancerPort=$3,InstanceProtocol=HTTPS,InstancePort=$3,SSLCertificateId=$certid --output text
+loadbalancercert=$(aws elb describe-load-balancers --load-balancer-name $1 --region $6 --query 'LoadBalancerDescriptions[*].ListenerDescriptions[*].Listener.[SSLCertificateId]' --output text | grep $certid)
+
+## even though we have the arn for the certificate it might not be ready, retry the create load balancer command if this is the case
+until [ -n  "$loadbalancercert" -a "$loadbalancercert" != " "  ]
+do
+	echo 'load balancer not created yet, retrying command'
+	sleep 30
+	aws elb create-load-balancer-listeners --region $6 --load-balancer-name $1 --listeners Protocol=HTTPS,LoadBalancerPort=$3,InstanceProtocol=HTTPS,InstancePort=$3,SSLCertificateId=$certid --output text
+	loadbalancercert=$(aws elb describe-load-balancers --load-balancer-name $1 --region $6 --query 'LoadBalancerDescriptions[*].ListenerDescriptions[*].Listener.[SSLCertificateId]' --output text | grep $certid)
+done
+
+echo 'load balancer listener created'
+
 aws elb create-load-balancer-policy --region $6 --load-balancer-name $1 --policy-name DSMConsoleStickySessions --policy-type-name LBCookieStickinessPolicyType --policy-attributes AttributeName=CookieExpirationPeriod,AttributeValue=600
 aws elb set-load-balancer-policies-of-listener --region $6 --load-balancer-name $1 --load-balancer-port 443 --policy-names DSMConsoleStickySessions

@@ -56,12 +56,12 @@
         },
         "DatabaseAdminPassword"    : {
             "NoEcho" : true,
-            "Description" : "The RDS Database administrator password. Must be 8-41 characters long and can only contain alphanumeric characters or the following special characters !$^*-_+",
+            "Description" : "The RDS Database administrator password. Must be 8-41 characters long and can only contain alphanumeric characters or the following special characters !^*-_+",
             "Type"        : "String",
             "MinLength"   : 8,
             "MaxLength"   : 41,
-            "AllowedPattern" : "[a-zA-Z0-9!$^*-_+]*",
-            "ConstraintDescription" : "Can only contain alphanumeric characters or the following special characters !$^*-_+ Min length 8, max length 41"
+            "AllowedPattern" : "[a-zA-Z0-9!^*\\-_+]*",
+            "ConstraintDescription" : "Can only contain alphanumeric characters or the following special characters !^*-_+ Min length 8, max length 41"
         },
 		"DeepSecuritySubnet"   : {
             "Description" : "Select an existing Subnet for Deep Seucurity Manager. Must be a public subnet contained the in VPC chosen above.",
@@ -83,12 +83,12 @@
         },
         "DeepSecurityAdminPass"     : {
             "NoEcho" : true,
-            "Description" : "The Deep Security Manager administrator password. Must be 8-41 characters long and can only contain alphanumeric characters or the following special characters !$^*-_+",
+            "Description" : "The Deep Security Manager administrator password. Must be 8-41 characters long and can only contain alphanumeric characters or the following special characters !^*-_+",
             "Type"        : "String",
             "MinLength"   : 8,
             "MaxLength"   : 41,
-            "AllowedPattern" : "[a-zA-Z0-9!$^*-_+]*",
-            "ConstraintDescription" : "Can only contain alphanumeric characters or the following special characters !$^*-_+ Min length 8, max length 41"
+            "AllowedPattern" : "[a-zA-Z0-9!^*\\-_+]*",
+            "ConstraintDescription" : "Can only contain alphanumeric characters or the following special characters !^*-_+ Min length 8, max length 41"
         },        
 		"LicenseKey"       : {
             "Description" : "If you have a Deep Security license key, enter it here. Including dashes (e.g. AP-E9RM-99WHE-B5UR5-BV8YB-HVYM8-HYYVG).",
@@ -100,7 +100,39 @@
         }
     },
 	"Mappings"                 : {
-        "RDSInstanceSize" : {
+	 "DSMSIZE" : {
+	        "us-east-1"      : {
+                "BYOL" : "c3.xlarge"
+            },
+			"us-west-1"      : {
+				"BYOL" : "c3.xlarge"
+            },
+            "us-west-2"      : {
+				"BYOL" : "c3.xlarge"
+            },
+			"eu-west-1"      : {
+				"BYOL" : "c3.xlarge"
+            },
+			"eu-central-1" : {
+				"BYOL" : "c3.xlarge"
+            },
+            "sa-east-1"    : {
+				"BYOL" : "c3.xlarge"
+            },
+            "ap-northeast-1" : {
+				"BYOL" : "c3.xlarge"
+            },
+            "ap-southeast-1" : {
+				"BYOL" : "c3.xlarge"
+            },
+            "ap-southeast-2" : {
+				"BYOL" : "c3.xlarge"
+            },
+			"ap-northeast-2" : {
+				"BYOL" : "m4.xlarge"
+            }
+        },
+		"RDSInstanceSize" : {
             "us-east-1"      : {
                 "Oracle" : "db.m4.xlarge",
 				"MSSQL" : "db.m4.xlarge"
@@ -135,6 +167,10 @@
             },
             "ap-southeast-2" : {
                 "Oracle" : "db.m3.xlarge",
+				"MSSQL" : "db.m4.xlarge"
+            },
+			"ap-northeast-2" : {
+                "Oracle" : "db.m4.xlarge",
 				"MSSQL" : "db.m4.xlarge"
             }
         },
@@ -172,6 +208,10 @@
 				"MSSQL" : "false"
             },
             "ap-southeast-2" : {
+                "Oracle" : "true",
+				"MSSQL" : "false"
+            },
+			"ap-northeast-2" : {
                 "Oracle" : "true",
 				"MSSQL" : "false"
             }
@@ -233,7 +273,13 @@
                     },
 					"DSIPHeartbeatPort" : "4120",
 					"DSIPGUIPort"       : "443",
-					"DSIPInstanceType"         : "c3.xlarge",
+					"DSIPInstanceType"         : {
+						"Fn::FindInMap" : [
+							"DSMSIZE",
+							{	"Ref" : "AWS::Region" },
+							"BYOL"
+						]		
+					},
 					"DBISubnet1"         : {
                         "Ref" : "DatabaseSubnet1"
                     },

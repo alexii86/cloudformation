@@ -47,12 +47,12 @@
         },
         "DeepSecurityAdminPass"     : {
             "NoEcho" : true,
-            "Description" : "The Deep Security Manager administrator password. Must be 8-41 characters long and can only contain alphanumeric characters or the following special characters !$^*-_+",
+            "Description" : "The Deep Security Manager administrator password. Must be 8-41 characters long and can only contain alphanumeric characters or the following special characters !^*-_+",
             "Type"        : "String",
             "MinLength"   : 8,
             "MaxLength"   : 41,
-            "AllowedPattern" : "[a-zA-Z0-9!$^*-_+]*",
-            "ConstraintDescription" : "Can only contain alphanumeric characters or the following special characters !$^*-_+ Min length 8, max length 41"
+            "AllowedPattern" : "[a-zA-Z0-9!^*\\-_+]*",
+            "ConstraintDescription" : "Can only contain alphanumeric characters or the following special characters !^*-_+ Min length 8, max length 41"
         },
 		"ProtectedInstances"           : {
             "Description" : "Select how many instances would you like to protect.",
@@ -66,18 +66,66 @@
         }
     },
     "Mappings"                 : {
-      "EC2InstanceSize" : {
-            "1-25"   : {
-                "TYPE" : "m3.large"
+		"EC2InstanceSize" : {
+			"us-east-1"      : {
+                "25" : "m4.large",
+				"50" : "m4.xlarge",
+				"100": "m4.2xlarge",
+				"200": "c4.4xlarge"
             },
-            "26-50"   : {
-                "TYPE" : "m3.xlarge"
+			"us-west-1"      : {
+				"25" : "m4.large",
+				"50" : "m4.xlarge",
+				"100": "m4.2xlarge",
+				"200": "c4.4xlarge"
             },
-            "51-100"  : {
-                "TYPE" : "m3.2xlarge"
+            "us-west-2"      : {
+				"25" : "m4.large",
+				"50" : "m4.xlarge",
+				"100": "m4.2xlarge",
+				"200": "c4.4xlarge"
             },
-            "101-200"  : {
-                "TYPE" : "c3.4xlarge"
+			"eu-west-1"      : {
+				"25" : "m4.large",
+				"50" : "m4.xlarge",
+				"100": "m4.2xlarge",
+				"200": "c4.4xlarge"
+            },
+			"eu-central-1" : {
+				"25" : "m4.large",
+				"50" : "m4.xlarge",
+				"100": "m4.2xlarge",
+				"200": "c4.4xlarge"
+            },
+            "sa-east-1"    : {
+				"25" : "m3.large",
+				"50" : "m3.xlarge",
+				"100": "m3.2xlarge",
+				"200": "c3.4xlarge"
+            },
+            "ap-northeast-1" : {
+				"25" : "m4.large",
+				"50" : "m4.xlarge",
+				"100": "m4.2xlarge",
+				"200": "c4.4xlarge"
+            },
+            "ap-southeast-1" : {
+				"25" : "m4.large",
+				"50" : "m4.xlarge",
+				"100": "m4.2xlarge",
+				"200": "c4.4xlarge"
+            },
+            "ap-southeast-2" : {
+				"25" : "m4.large",
+				"50" : "m4.xlarge",
+				"100": "m4.2xlarge",
+				"200": "c4.4xlarge"
+            },
+			"ap-northeast-2" : {
+				"25" : "m4.large",
+				"50" : "m4.xlarge",
+				"100": "m4.2xlarge",
+				"200": "c4.4xlarge"
             }
         },
 		"RDSStorageSize" : {
@@ -135,6 +183,9 @@
             },
             "ap-southeast-2" : {
                 "Oracle" : "db.m3.large"
+            },
+			"ap-northeast-2" : {
+                "Oracle" : "db.m4.large"
             }
         }
     },
@@ -194,9 +245,17 @@
 						"Fn::FindInMap" : [
 							"EC2InstanceSize",
 							{
-								"Ref" : "ProtectedInstances"
+								"Ref" : "AWS::Region"
 							},
-								"TYPE"
+							{
+								"Fn::FindInMap" : [
+									"PPULicenseSize",
+									{
+										"Ref" : "ProtectedInstances"
+									},
+										"Size"
+								]
+							}
 						]				
 					},
 					"DBISubnet1"         : {
