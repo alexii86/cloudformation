@@ -21,9 +21,7 @@
                 "db.m2.4xlarge",
                 "db.m1.medium",
                 "db.m1.large",
-                "db.m1.xlarge",
-				"db.m4.large",
-				"db.m4.xlarge"
+                "db.m1.xlarge"
             ],
             "ConstraintDescription" : "must select a valid database instance type."
         },
@@ -59,8 +57,8 @@
             "Type"        : "String",
             "MinLength"   : 8,
             "MaxLength"   : 41,
-            "AllowedPattern" : "[a-zA-Z0-9!$^*-_+]*",
-            "ConstraintDescription" : "Can only contain alphanumeric characters or the following special characters !$^*-_+ Min length 8, max length 41"
+            "AllowedPattern" : "[a-zA-Z0-9!$^​*\\-_+]*",
+            "ConstraintDescription" : "must contain only alphanumeric characters."
         },
         "DBPName"             : {
             "Default" : "dsm",
@@ -130,7 +128,7 @@
                     "Fn::If" : [
                         "MultiAZ",
                         { "Ref" : "DSSQLOptionGroup" },
-                        { "Ref" : "AWS::NoValue" }
+                        "AWS::NoValue"
                     ]
                 },
                 "StorageType" : { "Ref" : "StorageType" }

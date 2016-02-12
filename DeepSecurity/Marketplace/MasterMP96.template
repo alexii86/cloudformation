@@ -1,13 +1,13 @@
 {
     "AWSTemplateFormatVersion" : "2010-09-09",
-    "Description"              : "v2016-01-08: Trend Micro Deep Security Marketplace master template. For more information see http://aws.trendmicro.com",
+    "Description"              : "Trend Micro Deep Security Marketplace master template. For more information see http://aws.trendmicro.com",
     "Parameters"               : {
         "AWSIKeyPairName" : {
             "Description" : "Existing key pair to use for connecting to your Deep Security Manager Instance",
             "Type"        : "AWS::EC2::KeyPair::KeyName",
             "MinLength"   : "1",
             "MaxLength"   : "255",
-            "AllowedPattern" : "[-_a-zA-Z0-9]*",
+            "AllowedPattern" : "[-_a-zA-Z0-9. ]*",
             "ConstraintDescription" : "Select an existing EC2 Key Pair."
         },
         "AWSIVPC"         : {
@@ -44,9 +44,7 @@
                 "db.m2.4xlarge",
                 "db.m1.medium",
                 "db.m1.large",
-                "db.m1.xlarge",
-				"db.m4.large",
-				"db.m4.xlarge"
+                "db.m1.xlarge"
             ],
             "ConstraintDescription" : "must select a valid database instance type."
         },
@@ -90,8 +88,8 @@
             "Type"        : "String",
             "MinLength"   : 8,
             "MaxLength"   : 41,
-            "AllowedPattern" : "[a-zA-Z0-9!$^*-_+]*",
-            "ConstraintDescription" : "Can only contain alphanumeric characters or the following special characters !$^*-_+ Min length 8, max length 41"
+            "AllowedPattern" : "[a-zA-Z0-9!$^​*\\-_+]*",
+            "ConstraintDescription" : "Must contain only alphanumeric characters. Min length 8, max length 41"
         },
         "DBPEngine"            : {
             "Description" : "Choose SQL or Oracle for DSM database Engine",
@@ -132,8 +130,8 @@
             "Type"        : "String",
             "MinLength"   : 8,
             "MaxLength"   : 41,
-            "AllowedPattern" : "[a-zA-Z0-9!$^*-_+]*",
-            "ConstraintDescription" : "Can only contain alphanumeric characters or the following special characters !$^*-_+ Min length 8, max length 41"
+            "AllowedPattern" : "[a-zA-Z0-9!$^​*\\-_+]*",
+            "ConstraintDescription" : "must contain only alphanumeric characters."
         },
         "DSIMultiNode"         : {
             "Description" : "Select number of Deep Security Managers to Deploy",
@@ -176,10 +174,17 @@
                 "m3.large",
                 "m3.xlarge",
                 "m3.2xlarge",
+				"m4.large",
+                "m4.xlarge",
+                "m4.2xlarge",
                 "c3.xlarge",
                 "c3.2xlarge",
                 "c3.4xlarge",
                 "c3.8xlarge",
+				"c4.xlarge",
+                "c4.2xlarge",
+                "c4.4xlarge",
+                "c4.8xlarge",
                 "r3.large",
                 "r3.xlarge",
                 "r3.2xlarge",
@@ -748,7 +753,7 @@
                 "Handle" : {
                     "Ref" : "DSM1CompleteWaitHandle"
                 },
-                "Timeout" : "1800"
+                "Timeout" : "1200"
             }
         },
         "DSM1NoDBCompleteWaitHandle"      : {
